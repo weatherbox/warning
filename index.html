@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8' />
+    <title></title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.37.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.37.0/mapbox-gl.css' rel='stylesheet' />
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/semantic-ui/2.2.10/semantic.min.css">
+    <style>
+        body { margin:0; padding:0; }
+        #map { position:absolute; top:0; bottom:0; width:100%; }
+		#sidebar { padding:10px; }
+		#sidebar-close { position:absolute; top:5px; right:5px; display:none; }
+		#sidebar-title h2 { font-weight:500; margin-top:8px; }
+		#jma-link { font-size:12px; }
+		#sidebar-content { margin-top:15px; }
+		#sidebar-list .item { margin-left:15px; }
+    </style>
+</head>
+<body>
+
+<div class="pusher">
+	<div id='map'></div>
+
+</div>
+
+<div id="sidebar" class="ui sidebar bottom menu vertical">
+	<div id="sidebar-close"><i class="remove icon grey"></i></div>
+
+	<div id="sidebar-title">
+		<h2>細分区域</h2>
+	</div>
+
+	<div class="ui divider" style="margin-bottom:20px"></div>
+
+	<div id="jma-link">
+		<i class="linkify icon grey"></i>
+		<a href="" target="_blank">気象庁 | 気象警報・注意報</a>
+	</div>
+
+	<div id="sidebar-content">
+	</div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/semantic-ui/2.2.10/semantic.min.js"></script>
+<script src="map.js"></script>
+
+</body>
+</html>
+

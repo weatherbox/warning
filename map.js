@@ -6,7 +6,8 @@ $(function(){
 		zoom: 5,
 		center: [136.6, 35.5]
 	});
-	map.fitBounds([[127, 24], [147, 46]])
+	map.fitBounds([[127, 24], [147, 46]]);
+	map.touchZoomRotate.disableRotation();
 
 	var popup = new mapboxgl.Popup({
 		closeButton: false

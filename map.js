@@ -16,6 +16,7 @@ $(function(){
 	var zoomThreshold = 6;
 	var selected;
 
+	var warningData = {};
 	var warningColor = {
 		none:      "rgba(255, 255, 255, 0)",
 		advisory:  "rgba(254, 242, 99, 0.4)",
@@ -63,8 +64,8 @@ $(function(){
 		function hoverArea (e){
 			if (moving || zooming) return false;
 
-			var show_layer = (map.getZoom() <= zoomThreshold) ? 'pref' : 'city';
-			var features = map.queryRenderedFeatures(e.point, { layers: ['warning-area-' + show_layer] });
+			var layer = (map.getZoom() <= zoomThreshold) ? 'pref' : 'city';
+			var features = map.queryRenderedFeatures(e.point, { layers: ['warning-area-' + layer] });
 			map.getCanvas().style.cursor = (features.length) ? 'crosshair' : '';
 
 			if (!features.length) {
@@ -73,10 +74,21 @@ $(function(){
 			}
 
 			var feature = features[0];
-			var name_prop = (show_layer == 'city') ? 'name' : show_layer + 'Name';
+			var name_prop = (layer == 'city') ? 'name' : layer + 'Name';
+			var name = feature.properties[name_prop];
+			var code_prop = (layer == 'city') ? 'code' : layer + 'Code';
+			var code = feature.properties[code_prop];
+
+			var warnings = warningData[layer][code].warnings;
+			if (warnings.length){
+				name += '&emsp;';
+				for (var i in warnings){
+					name += warningLabel(warnings[i]);
+				}
+			}
 
 			popup.setLngLat(e.lngLat)
-				.setText(feature.properties[name_prop])
+				.setHTML(name)
 				.addTo(map);
 		}
 
@@ -163,15 +175,14 @@ $(function(){
 
 	function overlayWarning (layer){
 		$.get('https://s3-ap-northeast-1.amazonaws.com/vector-tile/warning/' + layer + '.json.gz', function (data){
+			warningData[layer] = data[layer + 'list'];
+
 			var source_layer = ((layer == 'city') ? '' : layer) + 'allgeojson';
 			var code_prop = (layer == 'city') ? 'code' : layer + 'Code';
 
 			var stops = [];
-
 			for (var code in data[layer + 'list']){
 				var status = data[layer + 'list'][code].status;
-				if (code.substr(0,2) == '11') status = 'warning';
-				if (code.substr(0,2) == '10') status = 'emergency';
 				stops.push([code, warningColor[status]]);
 			}
 
@@ -232,5 +243,14 @@ $(function(){
 		}
 	}
 
+	function warningLabel (warning_str){
+		if (warning_str.substr(-3) == '注意報'){
+			return '<a class="ui yellow label">' + warning_str.slice(0, -3) + '</a>';
+		}else if (warning_str.substr(-4) == '特別警報'){
+			return '<a class="ui violet label">' + warning_str.slice(0, -4) + '</a>';
+		}else if (warning_str.substr(-2) == '警報'){
+			return '<a class="ui red label">' + warning_str.slice(0, -2) + '</a>';
+		}
+	}
 
 });

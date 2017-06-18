@@ -119,7 +119,6 @@ $(function(){
 			map.setFilter(layerId, ["==", code_prop, code]);
 
 			if (layer == 'pref'){
-				console.log(features);
 				fitFeatureBounds(features[0]);
 			}
 
@@ -209,15 +208,11 @@ $(function(){
 	}
 
 	function fitFeatureBounds (feature){
-		var coordinates;
+		var coordinates = [];
 
 		if (feature.geometry.type == 'MultiPolygon'){
-			var len = 0;
 			for (var i in feature.geometry.coordinates){
-				if (feature.geometry.coordinates[i][0].length > len){
-					coordinates = feature.geometry.coordinates[i][0];
-					len = feature.geometry.coordinates[i][0].length;
-				}
+				Array.prototype.push.apply(coordinates, feature.geometry.coordinates[i][0]);
 			}
 
 		}else if (feature.geometry.type == 'Polygon'){

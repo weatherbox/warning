@@ -134,7 +134,7 @@ $(function(){
 				.sidebar('show');
 			}
 
-			selected = { feature: features[0], code: code, code_prop: code_prop };
+			selected = { layer: layer, feature: features[0], code: code };
 		}
 	});
 
@@ -239,6 +239,21 @@ $(function(){
 		var name_prop = (layer == 'city') ? 'name' : layer + 'Name';
 		$("#sidebar-title h2").text(feature.properties[name_prop]);
 		setJMALink(code, layer);
+
+		var labels = '';
+		var comment = warningData[layer][code].comment;
+		var warnings = warningData[layer][code].warnings;
+		if (warnings.length){
+			for (var i in warnings){
+				labels += warningLabel(warnings[i]);
+			}
+		}else{
+			comment = "気象警報・注意報は発表されていません"
+		}
+
+		$("#sidebar-labels").html(labels);
+		$("#sidebar-comment").html(comment);
+
 	}
 
 	function setJMALink (code, layer){

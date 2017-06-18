@@ -45,6 +45,9 @@ $(function(){
 
 		overlayWarning('pref');
 		overlayWarning('city');
+		
+		addSelectLayer('pref');
+		addSelectLayer('city');
 
 		// map event
 		var moving = false, zooming = false; // only pc
@@ -110,16 +113,16 @@ $(function(){
 			// show selected area on map
 			if (!mobile) map.getCanvas().style.cursor = 'pointer';
 
-			if (!map.getLayer(layerId)){
-				addSelectLayer(layer);
-			}
-
 			var code_prop = (layer == 'city') ? 'code' : layer + 'Code';
 			var code = features[0].properties[code_prop];
 			map.setFilter(layerId, ["==", code_prop, code]);
 
 			if (layer == 'pref'){
 				fitFeatureBounds(features[0], e.lngLat);
+				map.setFilter('selected-area-city', ["==", "", ""]);
+
+			}else{
+				map.setFilter('selected-area-pref', ["==", "", ""]);
 			}
 
 			// show data on sidebar
@@ -162,7 +165,7 @@ $(function(){
 			"source-layer": source_layer,
 			"paint": {
 				"fill-color": "rgba(126, 199, 216, 0.1)",
-				"fill-outline-color": "rgba(0, 84, 153, 0.5)"
+				"fill-outline-color": "rgba(0, 84, 153, 0.8)"
 			},
 			"filter": ["==", "code", ""]
 		});

@@ -227,7 +227,7 @@ $(function(){
 		}, new mapboxgl.LngLatBounds(coordinates[0], coordinates[0]));
 
 		var padding = (mobile) ? 
-			{ top: 10, bottom: 80, left: 10, right: 10 } :
+			{ top: 10, bottom: 100, left: 10, right: 10 } :
 			{ top: 20, bottom: 40, left: 150, right: 20 };
 
 		map.fitBounds(bounds, {
@@ -251,7 +251,11 @@ $(function(){
 			comment = "気象警報・注意報は発表されていません"
 		}
 
-		$("#sidebar-labels").html(labels);
+		if (mobile){
+			$("#sidebar-title h2").append('<span>' + labels + '</span>');
+		}else{
+			$("#sidebar-labels").html(labels);
+		}
 		$("#sidebar-comment").html(comment);
 
 	}

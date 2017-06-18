@@ -14,10 +14,17 @@ $(function(){
 
 	var zoomThreshold = 6;
 	var selected;
-	var $sidebar = $("#sidebar");
+
+	var warningColor = {
+		none:      "rgba(255, 255, 255, 0)",
+		advisory:  "rgba(254, 242, 99, 0.4)",
+		warning:   "rgba(233, 84, 107, 0.4)",
+		emergency: "rgba(98, 68, 152, 0.4)"
+	};
 
 
 	// responsive
+	var $sidebar = $("#sidebar");
 	var mobile = $(window).width() < 640;
 	if (mobile){
 
@@ -31,8 +38,8 @@ $(function(){
 
 
 	map.on("load", function() {
-		addVtileLayer('pref');
-		addVtileLayer('city');
+		addVtileSouce('pref');
+		addVtileSouce('city');
 
 		overlayWarning('pref');
 		overlayWarning('city');
@@ -108,7 +115,7 @@ $(function(){
 	});
 
 
-	function addVtileLayer (layer){
+	function addVtileSouce (layer){
 		var source_layer = ((layer == 'city') ? '' : layer) + 'allgeojson';
 		var source_suffix = (layer == 'city') ? '' : '-' + layer;
 
@@ -119,23 +126,6 @@ $(function(){
 			"tiles": ["https://s3-ap-northeast-1.amazonaws.com/vector-tile/warning-area" + source_suffix + "/{z}/{x}/{y}.pbf"],
 			"attribution": '<a href="http://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-N03-v2_3.html" target="_blank">国土数値情報</a>'
 		});
-
-		var layer_setting = {
-			"id": "warning-area-" + layer,
-			"type": "fill",
-			"source": "vtile-" + layer,
-			"source-layer": source_layer,
-			"paint": {
-				"fill-color": "rgba(255, 255, 255, 0)",
-				"fill-outline-color": "rgba(123, 124, 125, 0.7)"
-			}
-		};
-		if (layer == 'pref'){
-			layer_setting.maxzoom = zoomThreshold;
-		}else{
-			layer_setting.minzoom = zoomThreshold;
-		}
-		map.addLayer(layer_setting);
 	}
 
 	function selectLayer (layer){
@@ -172,29 +162,31 @@ $(function(){
 
 	function overlayWarning (layer){
 		$.get('https://s3-ap-northeast-1.amazonaws.com/vector-tile/warning/' + layer + '.json.gz', function (data){
-			console.log(data);
-
 			var source_layer = ((layer == 'city') ? '' : layer) + 'allgeojson';
 			var code_prop = (layer == 'city') ? 'code' : layer + 'Code';
 
-			var filter = ["in", code_prop];
+			var stops = [];
 
 			for (var code in data[layer + 'list']){
-				if (data[layer + 'list'][code].status == 'advisory'){
-					filter.push(code);
-				}
+				var status = data[layer + 'list'][code].status;
+				if (code.substr(0,2) == '11') status = 'warning';
+				if (code.substr(0,2) == '10') status = 'emergency';
+				stops.push([code, warningColor[status]]);
 			}
 
 			var layer_setting = {
-				"id": "selected-area-" + layer,
+				"id": "warning-area-" + layer,
 				"type": "fill",
 				"source": "vtile-" + layer,
 				"source-layer": source_layer,
 				"paint": {
-					"fill-color": "rgba(254, 242, 99, 0.4)",
+					"fill-color": {
+						"property": code_prop,
+						"type": "categorical",
+						"stops": stops
+					},
 					"fill-outline-color": "rgba(123, 124, 125, 0.7)"
-				},
-				"filter": filter
+				}
 			};
 
 			if (layer == 'pref'){
@@ -206,6 +198,7 @@ $(function(){
 			map.addLayer(layer_setting);
 		});
 	}
+
 
 	function updateSidebar (code, feature, wlayer){
 		var name_prop = (show_layer == 'city') ? 'name' : show_layer + 'Name';

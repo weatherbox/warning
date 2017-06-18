@@ -119,7 +119,7 @@ $(function(){
 			map.setFilter(layerId, ["==", code_prop, code]);
 
 			if (layer == 'pref'){
-				fitFeatureBounds(features[0]);
+				fitFeatureBounds(features[0], e.lngLat);
 			}
 
 			// show data on sidebar
@@ -207,10 +207,13 @@ $(function(){
 		});
 	}
 
-	function fitFeatureBounds (feature){
+	function fitFeatureBounds (feature, lngLat){
 		var coordinates = [];
 
-		if (feature.geometry.type == 'MultiPolygon'){
+		if (feature.properties.prefName == '東京都' && lngLat.lat > 35.4){ // tokyo main
+			coordinates = feature.geometry.coordinates[27][0];
+
+		}else if (feature.geometry.type == 'MultiPolygon'){
 			for (var i in feature.geometry.coordinates){
 				Array.prototype.push.apply(coordinates, feature.geometry.coordinates[i][0]);
 			}
@@ -224,8 +227,9 @@ $(function(){
 		}, new mapboxgl.LngLatBounds(coordinates[0], coordinates[0]));
 
 		var padding = (mobile) ? 
-			{ top: 10, bottom: 40, left: 10, right: 10 } :
+			{ top: 10, bottom: 80, left: 10, right: 10 } :
 			{ top: 20, bottom: 40, left: 150, right: 20 };
+
 		map.fitBounds(bounds, {
 			padding: padding
 		});

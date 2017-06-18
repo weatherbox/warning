@@ -29,10 +29,15 @@ $(function(){
 		});
 	}
 
-	map.on("load", function() {
-		addVtileLayer('city');
-		addVtileLayer('pref');
 
+	map.on("load", function() {
+		addVtileLayer('pref');
+		addVtileLayer('city');
+
+		overlayWarning('pref');
+		overlayWarning('city');
+
+		// map event
 		var moving = false, zooming = false; // only pc
 
 		if (mobile){
@@ -121,8 +126,8 @@ $(function(){
 			"source": "vtile-" + layer,
 			"source-layer": source_layer,
 			"paint": {
-				"fill-color": "rgba(126, 199, 216, 0.4)",
-				"fill-outline-color": "rgba(0, 84, 153, 0.7)"
+				"fill-color": "rgba(255, 255, 255, 0)",
+				"fill-outline-color": "rgba(123, 124, 125, 0.7)"
 			}
 		};
 		if (layer == 'pref'){
@@ -164,6 +169,43 @@ $(function(){
 		});
 	}
 
+
+	function overlayWarning (layer){
+		$.get('https://s3-ap-northeast-1.amazonaws.com/vector-tile/warning/' + layer + '.json.gz', function (data){
+			console.log(data);
+
+			var source_layer = ((layer == 'city') ? '' : layer) + 'allgeojson';
+			var code_prop = (layer == 'city') ? 'code' : layer + 'Code';
+
+			var filter = ["in", code_prop];
+
+			for (var code in data[layer + 'list']){
+				if (data[layer + 'list'][code].status == 'advisory'){
+					filter.push(code);
+				}
+			}
+
+			var layer_setting = {
+				"id": "selected-area-" + layer,
+				"type": "fill",
+				"source": "vtile-" + layer,
+				"source-layer": source_layer,
+				"paint": {
+					"fill-color": "rgba(254, 242, 99, 0.4)",
+					"fill-outline-color": "rgba(123, 124, 125, 0.7)"
+				},
+				"filter": filter
+			};
+
+			if (layer == 'pref'){
+				layer_setting.maxzoom = zoomThreshold;
+			}else{
+				layer_setting.minzoom = zoomThreshold;
+			}
+
+			map.addLayer(layer_setting);
+		});
+	}
 
 	function updateSidebar (code, feature, wlayer){
 		var name_prop = (show_layer == 'city') ? 'name' : show_layer + 'Name';

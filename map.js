@@ -243,8 +243,10 @@ $(function(){
 		$("#sidebar-title h2").text(feature.properties[name_prop]);
 		setJMALink(code, layer);
 
+		var pcode = (layer == 'city') ? prefcode(code) : code;
+		var comment = warningData['pref'][pcode].comment;
+
 		var labels = '';
-		var comment = warningData[layer][code].comment;
 		var warnings = warningData[layer][code].warnings;
 		if (warnings.length){
 			for (var i in warnings){
@@ -286,6 +288,18 @@ $(function(){
 		}else{
 			$("#jma-link a").attr("href", "http://www.jma.go.jp/jp/warn/3" + fcode + "_table.html#" + code);
 		}
+	}
+
+	function prefcode (citycode){
+		var pcode = citycode.substr(0, 2) + "0000";
+		if (pcode == "460000") {
+			if (citycode.substr(0, 5) != "46004"){
+				pcode = "460100";
+			}else{
+				pcode = "460040";
+			}
+		}
+		return pcode;
 	}
 
 	function warningLabel (warning_str){

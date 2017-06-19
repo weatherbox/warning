@@ -10,6 +10,7 @@ $(function(){
 	map.fitBounds([[127, 24], [147, 46]]);
 	map.touchZoomRotate.disableRotation();
 
+	var marker;
 	var popup = new mapboxgl.Popup({
 		closeButton: false
 	});
@@ -252,6 +253,25 @@ $(function(){
 
 	function showPoint(lat, lon){
 		console.log(lat, lon);
+		if (!marker){
+			var w = 12, h = 12, r = 6, fc = '#005B98';
+			var xmls = "http://www.w3.org/2000/svg";
+			var svg = document.createElementNS(xmls, 'svg');
+			svg.setAttribute('width', w);
+			svg.setAttribute('height', h);
+			var c = document.createElementNS(xmls, 'circle');
+			c.setAttribute('fill', fc);                
+			c.setAttribute('cx', w/2);
+			c.setAttribute('cy', h/2);
+			c.setAttribute('r',r);
+			svg.appendChild(c);
+
+			marker = new mapboxgl.Marker(svg).setLngLat([lon, lat]).addTo(map);
+		}else{
+			marker.setLngLat([lon, lat]);
+		}
+
+		map.flyTo({center: [lon, lat], zoom: 9});	
 	}
 
 	function updateSidebar (code, feature, layer){

@@ -18,6 +18,9 @@
 		#jma-link { font-size:12px; margin-top:20px; }
 		#sidebar-content { margin-top:10px; }
 		#sidebar-comment { margin:10px; }
+		#location-button { position:absolute; right:11px; bottom:15px; background:#fff;
+			box-shadow: 0 1px 2px 0 rgba(34,36,38,.15); }
+		#location-popup { position:absolute; top:auto; right:65px; bottom:18px; font-size:0.8rem; }
     </style>
 </head>
 <body>
@@ -25,6 +28,11 @@
 <div class="pusher">
 	<div id='map'></div>
 
+	<button id="location-button" class="circular ui icon large button">
+		<i class="icon crosshairs"></i>
+	</button>
+
+	<div id="location-popup" class="ui popup basic transition">現在地を取得中...</div>
 </div>
 
 <div id="sidebar" class="ui sidebar bottom menu vertical">

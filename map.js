@@ -4,7 +4,8 @@ $(function(){
 		container: 'map',
 		style: 'mapbox://styles/tattii/cj3jrmgsp002i2rt50tobxo27',
 		zoom: 5,
-		center: [136.6, 35.5]
+		center: [136.6, 35.5],
+		attributionControl: false
 	});
 	map.fitBounds([[127, 24], [147, 46]]);
 	map.touchZoomRotate.disableRotation();
@@ -38,6 +39,17 @@ $(function(){
 		});
 	}
 
+	// now location
+	$("#location-button").on("click", function(){
+		$("#location-popup").show();
+		navigator.geolocation.getCurrentPosition(function(position) {
+			$("#location-popup").hide();
+			showPoint(position.coords.latitude, position.coords.longitude);
+		},
+		function(error) {
+			alert(error.message);
+		});
+	});
 
 	map.on("load", function() {
 		addVtileSouce('pref');
@@ -164,7 +176,7 @@ $(function(){
 			"source": "vtile-" + layer,
 			"source-layer": source_layer,
 			"paint": {
-				"fill-color": "rgba(126, 199, 216, 0.1)",
+				"fill-color": "rgba(126, 199, 216, 0.2)",
 				"fill-outline-color": "rgba(0, 84, 153, 0.8)"
 			},
 			"filter": ["==", "code", ""]
@@ -236,6 +248,10 @@ $(function(){
 		map.fitBounds(bounds, {
 			padding: padding
 		});
+	}
+
+	function showPoint(lat, lon){
+		console.log(lat, lon);
 	}
 
 	function updateSidebar (code, feature, layer){

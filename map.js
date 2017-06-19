@@ -14,6 +14,7 @@ $(function(){
 	var popup = new mapboxgl.Popup({
 		closeButton: false
 	});
+	var moving = false, zooming = false; // only pc
 
 	var zoomThreshold = 6;
 	var selected;
@@ -26,13 +27,10 @@ $(function(){
 		emergency: "rgba(98, 68, 152, 0.4)"
 	};
 
-
 	// responsive
 	var $sidebar = $("#sidebar");
 	var mobile = $(window).width() < 640;
-	if (mobile){
-
-	}else{ // pc
+	if (!mobile){ // pc
 		$sidebar.removeClass("bottom").addClass("left");
 		$("#sidebar-close").show();
 		$("#sidebar-close").on("click", function(){
@@ -63,7 +61,6 @@ $(function(){
 		addSelectLayer('city');
 
 		// map event
-		var moving = false, zooming = false; // only pc
 
 		if (mobile){
 			map.on('mousemove', selectArea);
@@ -76,83 +73,83 @@ $(function(){
 			map.on('zoomstart', function (){ zooming = true; });
 			map.on('zoomend',   function (){ zooming = false; });
 		}
-
-		function hoverArea (e){
-			if (moving || zooming) return false;
-
-			var layer = (map.getZoom() <= zoomThreshold) ? 'pref' : 'city';
-			var features = map.queryRenderedFeatures(e.point, { layers: ['warning-area-' + layer] });
-			map.getCanvas().style.cursor = (features.length) ? 'crosshair' : '';
-
-			if (!features.length) {
-				popup.remove();
-				return;
-			}
-
-			var feature = features[0];
-			var name_prop = (layer == 'city') ? 'name' : layer + 'Name';
-			var name = feature.properties[name_prop];
-			var code_prop = (layer == 'city') ? 'code' : layer + 'Code';
-			var code = feature.properties[code_prop];
-
-			var warnings = warningData[layer][code].warnings;
-			if (warnings.length){
-				name += '&emsp;';
-				for (var i in warnings){
-					name += warningLabel(warnings[i]);
-				}
-			}
-
-			popup.setLngLat(e.lngLat)
-				.setHTML(name)
-				.addTo(map);
-		}
-
-		function selectArea (e){
-			var layer = (map.getZoom() <= zoomThreshold) ? 'pref' : 'city';
-			var features = map.queryRenderedFeatures(e.point, { layers: ['warning-area-' + layer] });
-			var layerId = 'selected-area-' + layer;
-
-			// mobile click out of area
-			if (!features.length){
-				if (mobile && map.getLayer(layerId)){
-					map.setFilter(layerId, ["==", "", ""]);
-					selected = null;
-					$sidebar.sidebar("hide");
-				}
-				return;
-			}
-
-			// show selected area on map
-			if (!mobile) map.getCanvas().style.cursor = 'pointer';
-
-			var code_prop = (layer == 'city') ? 'code' : layer + 'Code';
-			var code = features[0].properties[code_prop];
-			map.setFilter(layerId, ["==", code_prop, code]);
-
-			if (layer == 'pref'){
-				fitFeatureBounds(features[0], e.lngLat);
-				map.setFilter('selected-area-city', ["==", "", ""]);
-
-			}else{
-				map.setFilter('selected-area-pref', ["==", "", ""]);
-			}
-
-			// show data on sidebar
-			if (!selected || code != selected.code){
-				updateSidebar(code, features[0], layer);
-			}
-
-			if ($sidebar.sidebar("is hidden")){
-				$sidebar.sidebar('setting', 'transition', 'overlay')
-				.sidebar('setting', 'dimPage', false)
-				.sidebar('setting', 'closable', false)
-				.sidebar('show');
-			}
-
-			selected = { layer: layer, feature: features[0], code: code };
-		}
 	});
+
+	function hoverArea (e){
+		if (moving || zooming) return false;
+
+		var layer = (map.getZoom() <= zoomThreshold) ? 'pref' : 'city';
+		var features = map.queryRenderedFeatures(e.point, { layers: ['warning-area-' + layer] });
+		map.getCanvas().style.cursor = (features.length) ? 'crosshair' : '';
+
+		if (!features.length) {
+			popup.remove();
+			return;
+		}
+
+		var feature = features[0];
+		var name_prop = (layer == 'city') ? 'name' : layer + 'Name';
+		var name = feature.properties[name_prop];
+		var code_prop = (layer == 'city') ? 'code' : layer + 'Code';
+		var code = feature.properties[code_prop];
+
+		var warnings = warningData[layer][code].warnings;
+		if (warnings.length){
+			name += '&emsp;';
+			for (var i in warnings){
+				name += warningLabel(warnings[i]);
+			}
+		}
+
+		popup.setLngLat(e.lngLat)
+			.setHTML(name)
+			.addTo(map);
+	}
+
+	function selectArea (e){
+		var layer = (map.getZoom() <= zoomThreshold) ? 'pref' : 'city';
+		var features = map.queryRenderedFeatures(e.point, { layers: ['warning-area-' + layer] });
+		var layerId = 'selected-area-' + layer;
+
+		// mobile click out of area
+		if (!features.length){
+			if (mobile && map.getLayer(layerId)){
+				map.setFilter(layerId, ["==", "", ""]);
+				selected = null;
+				$sidebar.sidebar("hide");
+			}
+			return;
+		}
+
+		// show selected area on map
+		if (!mobile) map.getCanvas().style.cursor = 'pointer';
+
+		var code_prop = (layer == 'city') ? 'code' : layer + 'Code';
+		var code = features[0].properties[code_prop];
+		map.setFilter(layerId, ["==", code_prop, code]);
+
+		if (layer == 'pref'){
+			fitFeatureBounds(features[0], e.lngLat);
+			map.setFilter('selected-area-city', ["==", "", ""]);
+
+		}else{
+			map.setFilter('selected-area-pref', ["==", "", ""]);
+		}
+
+		// show data on sidebar
+		if (!selected || code != selected.code){
+			updateSidebar(code, features[0], layer);
+		}
+
+		if ($sidebar.sidebar("is hidden")){
+			$sidebar.sidebar('setting', 'transition', 'overlay')
+			.sidebar('setting', 'dimPage', false)
+			.sidebar('setting', 'closable', false)
+			.sidebar('show');
+		}
+
+		selected = { layer: layer, feature: features[0], code: code };
+	}
 
 
 	function addVtileSouce (layer){
@@ -271,7 +268,12 @@ $(function(){
 			marker.setLngLat([lon, lat]);
 		}
 
-		map.flyTo({center: [lon, lat], zoom: 9});	
+		var flylon = (mobile) ? lon : lon - 0.14;
+		map.flyTo({center: [flylon, lat], zoom: 9});
+
+		map.on("moveend", function (e){
+			setTimeout(function(){ selectArea({ point: map.project([lon, lat]) }); }, 500);
+		});
 	}
 
 	function updateSidebar (code, feature, layer){

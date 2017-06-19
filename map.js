@@ -269,7 +269,8 @@ $(function(){
 		}
 
 		var flylon = (mobile) ? lon : lon - 0.14;
-		map.flyTo({center: [flylon, lat], zoom: 9});
+		var flylat = (mobile) ? lat - 0.1 : lat;
+		map.flyTo({center: [flylon, flylat], zoom: 9});
 
 		map.on("moveend", function (e){
 			setTimeout(function(){ selectArea({ point: map.project([lon, lat]) }); }, 500);

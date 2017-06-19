@@ -272,9 +272,14 @@ $(function(){
 		var flylat = (mobile) ? lat - 0.1 : lat;
 		map.flyTo({center: [flylon, flylat], zoom: 9});
 
+		var done = false;
 		map.on("moveend", function (e){
+			if (done) return false;
 			map.off("moveend", this);
-			setTimeout(function(){ selectArea({ point: map.project([lon, lat]) }); }, 500);
+			setTimeout(function(){
+				done = true;
+				selectArea({ point: map.project([lon, lat]) });
+			}, 500);
 		});
 	}
 

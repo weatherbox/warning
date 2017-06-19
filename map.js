@@ -273,6 +273,7 @@ $(function(){
 		map.flyTo({center: [flylon, flylat], zoom: 9});
 
 		map.on("moveend", function (e){
+			map.off("moveend", this);
 			setTimeout(function(){ selectArea({ point: map.project([lon, lat]) }); }, 500);
 		});
 	}

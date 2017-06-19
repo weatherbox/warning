@@ -263,7 +263,8 @@ $(function(){
 			c.setAttribute('r',r);
 			svg.appendChild(c);
 
-			marker = new mapboxgl.Marker(svg).setLngLat([lon, lat]).addTo(map);
+			marker = new mapboxgl.Marker(svg, { offset: [-w/2, -h/2] })
+				.setLngLat([lon, lat]).addTo(map);
 		}else{
 			marker.setLngLat([lon, lat]);
 		}

@@ -291,6 +291,7 @@ $(function(){
 
 		var pcode = (layer == 'pref') ? code : feature.properties.prefCode;
 		var comment = warningData['pref'][pcode].comment;
+		var report_time = warningData['pref'][pcode].report_time;
 
 		var labels = '';
 		var warnings = warningData[layer][code].warnings;
@@ -307,9 +308,17 @@ $(function(){
 		}else{
 			$("#sidebar-labels").html(labels);
 		}
+
+        comment += '<br/><div>' + reportTime(report_time) + '</div>'
 		$("#sidebar-comment").html(comment);
 
 	}
+
+    function reportTime (t){
+        var date = t.substr(0, 4) + '/' + t.substr(4, 2) + '/' + t.substr(6, 2);
+        var time = t.substr(8, 2) + ':' + t.substr(10, 2);
+        return date + ' ' + time;
+    }
 
 	function setJMALink (code, layer){
 		var pcode = parseInt(code.substr(0, 2)), fcode;

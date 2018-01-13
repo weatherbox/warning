@@ -62,7 +62,7 @@ $(function(){
 
 		// map event
 
-		if (mobile){
+		if (_isTouchDevice()){
 			map.on('mousemove', selectArea);
 
 		}else{
@@ -74,6 +74,12 @@ $(function(){
 			map.on('zoomend',   function (){ zooming = false; });
 		}
 	});
+
+    function  _isTouchDevice() {
+        return (('ontouchstart' in window)
+                || (navigator.MaxTouchPoints > 0)
+                || (navigator.msMaxTouchPoints > 0));
+    }
 
 	function hoverArea (e){
 		if (moving || zooming) return false;
